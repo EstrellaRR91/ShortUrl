@@ -1,5 +1,4 @@
-# ShortUrl
-Backend URL shortening service built with Spring Boot, Redis for caching, MySQL for persistence, and secure JWT authentication. Includes IP rate limiting, RESTful APIs, and modular design
+Servicio backend para acortar URLs construido con Spring Boot, Redis para caché, MySQL para persistencia y autenticación segura con JWT. Incluye limitación de tasa por IP, APIs RESTful y diseño modular
 
  ShortURL - Servicio de Acortamiento de URLs
 
