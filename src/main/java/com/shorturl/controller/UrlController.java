@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.MalformedURLException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -66,20 +67,17 @@ public class UrlController {
         }
     }
 
-
     @GetMapping("/{shortCode}")
     public ResponseEntity<Void> redirectToOriginalUrl(@PathVariable String shortCode, HttpServletRequest request) {
-        Url url = urlService.findByShortCode(shortCode);
-        if (url == null) {
+        Optional<Url> optionalUrl = urlService.findByShortCode(shortCode);
+        if (optionalUrl.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-
-        // máximo de usos 
+        Url url = optionalUrl.get();
+        
         if (url.getMaxUses() != null && url.getVisitCount() >= url.getMaxUses()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
-        // Registrar visita
         urlService.registerVisit(url, request.getRemoteAddr(), request.getHeader("User-Agent"));
 
         HttpHeaders headers = new HttpHeaders();
@@ -91,12 +89,12 @@ public class UrlController {
     public ResponseEntity<?> getUrlStats(@PathVariable String shortCode, HttpServletRequest request) {
         String ip= request.getRemoteAddr();
         String userAgent = request.getHeader("User-Agent");
-        Url url = urlService.findByShortCode(shortCode);
-        urlService.registerVisit( url, ip, userAgent);
-        if (url == null) {
+        Optional<Url> optionalUrl = urlService.findByShortCode(shortCode);
+        if (optionalUrl.isEmpty()){
             return ResponseEntity.notFound().build();
         }
-
+        Url url = optionalUrl.get();
+        urlService.registerVisit(url, ip, userAgent);
         UrlStatsResponse stats = new UrlStatsResponse();
         stats.setOriginalUrl(url.getOriginalUrl());
         stats.setShortCode(url.getShortCode());

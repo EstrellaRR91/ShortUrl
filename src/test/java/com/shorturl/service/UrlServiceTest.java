@@ -2,25 +2,29 @@ package com.shorturl.service;
 
 import com.shorturl.model.Url;
 import com.shorturl.repository.UrlRepository;
+import org.springframework.data.redis.core.RedisTemplate;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 
 @SpringBootTest
 @ActiveProfiles("test")
-@ExtendWith(SpringExtension.class)
 public class UrlServiceTest {
+
+    @MockBean
+    private RedisTemplate<String, String> RedisTemplate;
     
     @Autowired
     private UrlService urlService;
@@ -28,21 +32,24 @@ public class UrlServiceTest {
     @Autowired
     private UrlRepository urlRepository;
 
+    @AfterEach
+    void cleanUp(){
+        urlRepository.deleteAll();
+    }
+
     @Test
     public void testCreateAndFindUrl() {
-        // Crear una URL nueva
         Url url = new Url();
-        url.setOriginalUrl("https://openai.com");
-        url.setShortUrl("abc123");
+        url.setOriginalUrl("https://youtube.com");
+        url.setShortCode("abc123");
 
-        // Guardar en base de datos (H2 en memoria)
         urlRepository.save(url);
 
-        // Buscar por shortUrl usando el servicio
-        Optional<Url> found = urlService.findByShortUrl("abc123");
+        Optional<Url> found = urlService.findByShortCode("abc123");
 
         assertThat(found).isPresent();
-        assertThat(found.get().getOriginalUrl()).isEqualTo("https://openai.com");
+        assertThat(found.get().getOriginalUrl()).isEqualTo("https://youtube.com");
 
     }
+
 }

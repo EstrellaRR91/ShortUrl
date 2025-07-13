@@ -84,25 +84,23 @@ public class UrlService {
         return true; 
     }
 }
-    public Url findByShortCode(String shortCode) {
+    public Optional<Url> findByShortCode(String shortCode) {
         boolean isActive = redisTemplate.hasKey(shortCode);
         if (!isActive){
-            throw new RuntimeException("El shortCode ha expirado o no existe en caché.");
+            return Optional.empty();
         }
         String cachedoriginalUrl = redisTemplate.opsForValue().get(shortCode);
         if (cachedoriginalUrl != null){
             Url url= new Url();
             url.setOriginalUrl(cachedoriginalUrl);
             url.setShortCode(shortCode);
-            return url;
+            return Optional.of(url);
         }
         Optional<Url> urlOpt = urlRepository.findByShortCode(shortCode);
-        if (urlOpt.isPresent()){
-            Url url =urlOpt.get();
-            redisTemplate.opsForValue().set(shortCode, url.getOriginalUrl());
-            return url;
-        }
-            throw new RuntimeException("URL not found for short code: " + shortCode);
+        urlOpt.ifPresent( url ->
+            redisTemplate.opsForValue().set(shortCode, url.getOriginalUrl()));
+            return urlOpt;
+        
     }
     public Url registerVisit(Url url, String ip, String userAgent ){
 
