@@ -28,4 +28,6 @@ Aplicación backend construida con Spring Boot para generar enlaces cortos desde
 1. Clonar el repositorio:
 
 ```bash
+git clone https://github.com/EstrellaRR91/ShortUrl.git
+   cd ShortUrl
 
