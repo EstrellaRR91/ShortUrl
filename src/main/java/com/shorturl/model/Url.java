@@ -117,4 +117,12 @@ public class Url {
     public void setMaxUses(Integer maxUses) {
         this.maxUses = maxUses;
     }
+
+    public LocalDateTime getExpiresAt() {
+    return expiresAt;
+}
+
+public void setExpiresAt(LocalDateTime expiresAt) {
+    this.expiresAt = expiresAt;
+}
 }

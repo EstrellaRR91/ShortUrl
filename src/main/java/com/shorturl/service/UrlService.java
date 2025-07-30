@@ -6,12 +6,10 @@ import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -42,15 +40,17 @@ public class UrlService {
         url.setOriginalUrl(originalUrl);
         url.setShortCode(shortCode);
         url.setMaxUses(maxUses);
-
-        Url savedUrl = urlRepository.save(url);
         
         if (expireMinutes != null && expireMinutes > 0){
+            url.setExpiresAt(LocalDateTime.now().plusMinutes(expireMinutes
+            ));
             redisTemplate.opsForValue().set(shortCode, originalUrl, Duration.ofMinutes(expireMinutes));
+
         }else{
             redisTemplate.opsForValue().set(shortCode, originalUrl);
+            url.setExpiresAt(null);
         }
-        return savedUrl; 
+        return urlRepository.save(url);
     }
 
     public Optional<Url> getOriginalUrl(String shortCode) {
@@ -75,6 +75,7 @@ public class UrlService {
     private static final List<String> BLACKLISTED_DOMAINS = List.of(
     "malware.com", "phishing.net", "evil.org");
 
+    @SuppressWarnings("unused")
     private boolean isBlacklisted(String url) {
     try {
         URI uri = new URI(url);
@@ -131,6 +132,24 @@ public class UrlService {
         }
         
         return count != null && count > MAX_REQUESTS_PER_MINUTE;
+    }
+
+    public Optional<Map<String, Object>> getUrlStatistics(String shortCode){
+        Optional<Url> urlOpt =urlRepository.findByShortCode(shortCode);
+        if (urlOpt.isEmpty()){
+            return Optional.empty();
+        }
+        Url url = urlOpt.get();
+        Map<String, Object> stats= new HashMap<>();
+        stats.put("shortCode", url.getShortCode());
+        stats.put("originalUrl",url.getOriginalUrl());
+        stats.put("createdAd", url.getCreatedAt());
+        stats.put("visitCount", url.getVisitCount());
+        stats.put("lastAccess", url.getLastAccess());
+        stats.put("maxUses", url.getMaxUses());
+        stats.put("expiresAt", url.getExpiresAt());
+
+        return Optional.of(stats);
     }
 
 }

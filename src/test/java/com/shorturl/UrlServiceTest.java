@@ -1,30 +1,24 @@
-package com.shorturl.service;
+package com.shorturl;
 
-import com.shorturl.model.Url;
-import com.shorturl.repository.UrlRepository;
-import org.springframework.data.redis.core.RedisTemplate;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+
+import com.shorturl.model.Url;
+import com.shorturl.repository.UrlRepository;
+import com.shorturl.service.UrlService;
 
 
 @SpringBootTest
 @ActiveProfiles("test")
 public class UrlServiceTest {
 
-    @MockBean
-    private RedisTemplate<String, String> RedisTemplate;
     
     @Autowired
     private UrlService urlService;
@@ -39,6 +33,7 @@ public class UrlServiceTest {
 
     @Test
     public void testCreateAndFindUrl() {
+
         Url url = new Url();
         url.setOriginalUrl("https://youtube.com");
         url.setShortCode("abc123");
@@ -51,5 +46,15 @@ public class UrlServiceTest {
         assertThat(found.get().getOriginalUrl()).isEqualTo("https://youtube.com");
 
     }
+
+    @Test
+    public void testCreateShortUrl() {
+
+        Url url = urlService.createShortUrl("https://youtube.com", null, null);
+
+        assertThat(url.getShortCode()).isNotNull();
+        assertThat(url.getOriginalUrl()).isEqualTo("https://youtube.com");
+    }
+
 
 }

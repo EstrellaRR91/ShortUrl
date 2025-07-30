@@ -1,4 +1,4 @@
-package com.shorturl.controller;
+package com.shorturl;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
-@RestController
+@RestController("AuthenticationControllerV2")
 @RequestMapping("/auth")
 public class AuthenticationController {
 
