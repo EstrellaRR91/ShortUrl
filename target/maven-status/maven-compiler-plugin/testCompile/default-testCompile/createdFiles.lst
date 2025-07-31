@@ -1,0 +1,6 @@
+com\shorturl\AuthenticationControllerIntegrationTest.class
+com\shorturl\SecurityConfigTest.class
+com\shorturl\SecurityConfigTest$MockBeansConfig.class
+com\shorturl\TestRedisConfig.class
+com\shorturl\UrlServiceTest.class
+com\shorturl\SecurityConfigTest$EmbeddedRedisConfig.class
